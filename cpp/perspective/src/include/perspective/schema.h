@@ -48,6 +48,7 @@ struct PERSPECTIVE_EXPORT t_schema {
     std::string str() const;
     t_schema drop(const std::set<std::string>& columns) const;
     t_schema operator+(const t_schema& o) const;
+    std::string agg_str(const size_t agg_id) const;
     std::vector<std::string> m_columns;
     std::vector<t_dtype> m_types;
     t_suidxmap m_colidx_map;

@@ -205,8 +205,17 @@ class Row extends HTMLElement {
         this._visible.addEventListener("mousedown", event => this.dispatchEvent(new CustomEvent("visibility-clicked", {detail: event})));
         this._row_close.addEventListener("mousedown", event => this.dispatchEvent(new CustomEvent("close-clicked", {detail: event})));
         this._agg_dropdown.addEventListener("change", event => {
-            this.setAttribute("aggregate", this._agg_dropdown.value);
-            this.dispatchEvent(new CustomEvent("aggregate-selected", {detail: event}));
+            let name = this.getAttribute("name");
+            let findIndex = Array.prototype.slice.call(this.parentElement.children).findIndex(col => col.getAttribute("name") === name && col.getAttribute("aggregate") === this._agg_dropdown.value);
+            if(findIndex !== -1)
+            {
+                this._agg_dropdown.value = this.getAttribute("aggregate");
+            }
+            else
+            {
+                this.setAttribute("aggregate", this._agg_dropdown.value);
+                this.dispatchEvent(new CustomEvent("aggregate-selected", {detail: event}));
+            }
         });
         this._sort_order.addEventListener("click", event => {
             this.dispatchEvent(new CustomEvent("sort-order", {detail: event}));

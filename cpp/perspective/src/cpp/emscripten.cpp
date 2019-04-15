@@ -1602,6 +1602,7 @@ namespace binding {
     t_config
     make_view_config(
         const t_schema& schema, std::string separator, val date_parser, val config) {
+        val j_columns = config["columns"];
         val j_row_pivot = config["row_pivots"];
         val j_column_pivot = config["column_pivots"];
         val j_aggregate = config["aggregate"];
@@ -1636,7 +1637,13 @@ namespace binding {
 
         std::vector<std::string> col_names;
         if (aggregates.size() > 0) {
-            col_names = _get_aggregate_names(aggregates);
+            if (hasValue(j_columns)) {
+                col_names = vecFromArray<val, std::string>(j_columns);
+            }
+            else{
+                col_names = _get_aggregate_names(aggregates);
+            }
+
         } else {
             auto t_aggs = schema.columns();
             auto okey_itr = std::find(t_aggs.begin(), t_aggs.end(), "psp_okey");

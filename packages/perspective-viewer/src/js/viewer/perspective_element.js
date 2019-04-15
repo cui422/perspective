@@ -147,9 +147,9 @@ export class PerspectiveElement extends StateElement {
             const aggregate = aggregates.find(a => a.column === name).op;
             const row = this._new_row(name, schema[name], aggregate, null, null, computed_schema[name]);
             this._inactive_columns.appendChild(row);
-            if (shown.includes(name)) {
+            /*if (shown.includes(name)) {
                 row.classList.add("active");
-            }
+            }*/
         }
 
         for (const x of shown) {
@@ -157,11 +157,11 @@ export class PerspectiveElement extends StateElement {
             this._active_columns.appendChild(active_row);
         }
 
-        if (all_cols.length === shown.length) {
+        /*if (all_cols.length === shown.length) {
             this._inactive_columns.parentElement.classList.add("collapse");
         } else {
             this._inactive_columns.parentElement.classList.remove("collapse");
-        }
+        }*/
 
         this._show_column_selectors();
 

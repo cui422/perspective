@@ -23,10 +23,22 @@ export class StateElement extends HTMLElement {
     _get_view_dom_columns(selector, callback) {
         selector = selector || "#active_columns perspective-row";
         let columns = Array.prototype.slice.call(this.shadowRoot.querySelectorAll(selector));
+        let updated_columns = []; 
+        let i = columns.length;
+        while(i--) updated_columns[i] = columns[i].cloneNode(true);
+        
+        updated_columns.forEach(function(col){
+            let cols = columns.filter(cl => cl.getAttribute("name") === col.getAttribute("name"));
+            if(cols.length > 1)
+            {
+                col.setAttribute("name", col.getAttribute("name") + "(" + col.getAttribute("aggregate") + ")");
+            }
+        });
+        
         if (!callback) {
-            return columns;
+            return updated_columns;
         }
-        return columns.map(callback);
+        return updated_columns.map(callback);
     }
 
     _get_view_columns({active = true} = {}) {
