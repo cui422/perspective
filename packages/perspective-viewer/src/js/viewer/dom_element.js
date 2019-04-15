@@ -63,6 +63,13 @@ export class DomElement extends PerspectiveElement {
                 aggregate = perspective.AGGREGATE_DEFAULTS[type];
             }
         }
+        else
+        {
+            let aggregates = this.get_aggregate_attribute();
+            if (aggregates.find(x => x.column === name && x.op === aggregate)) {
+                aggregate = perspective.TYPE_AGGREGATES[type].find(agg => agg !== aggregate);
+            }
+        }
 
         if (filter) {
             row.setAttribute("filter", filter);
@@ -98,11 +105,20 @@ export class DomElement extends PerspectiveElement {
         row.addEventListener("row-drag", () => {
             this.classList.add("dragging");
             this._original_index = Array.prototype.slice.call(this._active_columns.children).findIndex(x => x.getAttribute("name") === name);
-            if (this._original_index !== -1) {
+            /*if (this._original_index !== -1) {
                 this._drop_target_hover = this._active_columns.children[this._original_index];
                 setTimeout(() => row.setAttribute("drop-target", true));
             } else {
                 this._drop_target_hover = this._new_row(name, type, aggregate);
+            }*/
+            if(row.parentElement.getAttribute("id") === "inactive_columns")
+            {
+                this._drop_target_hover = this._new_row(name, type, aggregate);
+            }
+            else
+            {
+                this._drop_target_hover = this._active_columns.children[this._original_index];
+                setTimeout(() => row.setAttribute("drop-target", true));
             }
         });
         row.addEventListener("row-dragend", () => this.classList.remove("dragging"));
@@ -119,21 +135,22 @@ export class DomElement extends PerspectiveElement {
         if (!columns) {
             columns = this._get_view_columns();
         }
+        
         this.setAttribute("columns", JSON.stringify(columns));
         const lis = this._get_view_dom_columns("#inactive_columns perspective-row");
-        if (columns.length === lis.length) {
+        /*if (columns.length === lis.length) {
             this._inactive_columns.parentElement.classList.add("collapse");
         } else {
             this._inactive_columns.parentElement.classList.remove("collapse");
         }
         lis.forEach(x => {
             const index = columns.indexOf(x.getAttribute("name"));
-            if (index === -1) {
+	    if (index === -1) {
                 x.classList.remove("active");
             } else {
                 x.classList.add("active");
             }
-        });
+        });*/
         if (reset) {
             this._update_column_list(columns, this._active_columns, name => {
                 const ref = lis.find(x => x.getAttribute("name") === name);

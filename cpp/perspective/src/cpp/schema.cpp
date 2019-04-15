@@ -36,6 +36,11 @@ t_schema::t_schema(const std::vector<std::string>& columns, const std::vector<t_
          ++idx) {
         m_colidx_map[columns[idx]] = idx;
         m_coldt_map[columns[idx]] = types[idx];
+        for(size_t agg_idx = t_aggtype::AGGTYPE_SUM; agg_idx <= t_aggtype::AGGTYPE_PCT_SUM_GRAND_TOTAL; agg_idx++)
+        {
+            m_colidx_map[columns[idx] + "(" + agg_str(agg_idx) + ")"] = idx;
+            m_coldt_map[columns[idx] + "(" + agg_str(agg_idx) + ")"] = types[idx];
+        }
         m_status_enabled[idx] = true;
         if (columns[idx] == pkey_str) {
             pkey_found = true;
@@ -100,6 +105,11 @@ t_schema::add_column(const std::string& colname, t_dtype dtype) {
     m_types.push_back(dtype);
     m_colidx_map[colname] = idx;
     m_coldt_map[colname] = dtype;
+    for(size_t agg_idx = t_aggtype::AGGTYPE_SUM; agg_idx <= t_aggtype::AGGTYPE_PCT_SUM_GRAND_TOTAL; agg_idx++)
+    {
+        m_colidx_map[colname + "(" + agg_str(agg_idx) + ")"] = idx;
+        m_coldt_map[colname + "(" + agg_str(agg_idx) + ")"] = dtype;
+    }
 
     if (colname == std::string("psp_pkey")) {
         m_pkeyidx = idx;
@@ -193,7 +203,105 @@ t_schema::operator+(const t_schema& o) const {
     return rv;
 }
 
-} // end namespace perspective
+std::string
+t_schema::agg_str(const size_t agg_id) const {
+    switch (static_cast<t_aggtype>(agg_id)) {
+        case t_aggtype::AGGTYPE_SUM: {
+            return "sum";
+        } break;
+        case t_aggtype::AGGTYPE_SUM_ABS: {
+            return "sum abs";
+        } break;
+        case t_aggtype::AGGTYPE_MUL: {
+            return "mul";
+        } break;
+        case t_aggtype::AGGTYPE_COUNT: {
+            return "count";
+        } break;
+        case t_aggtype::AGGTYPE_MEAN: {
+            return "mean";
+        } break;
+        case t_aggtype::AGGTYPE_WEIGHTED_MEAN: {
+            return "avg";
+        } break;
+        case t_aggtype::AGGTYPE_UNIQUE: {
+            return "unique";
+        } break;
+        case t_aggtype::AGGTYPE_ANY: {
+            return "any";
+        } break;
+        case t_aggtype::AGGTYPE_MEDIAN: {
+            return "median";
+        } break;
+        case t_aggtype::AGGTYPE_JOIN: {
+            return "join";
+        } break;
+        case t_aggtype::AGGTYPE_SCALED_DIV: {
+            return "scaled div";
+        } break;
+        case t_aggtype::AGGTYPE_SCALED_ADD: {
+            return "scaled add";
+        } break;
+        case t_aggtype::AGGTYPE_SCALED_MUL: {
+            return "scaled mul";
+        } break;
+        case t_aggtype::AGGTYPE_DOMINANT: {
+            return "dominant";
+        } break;
+        case t_aggtype::AGGTYPE_FIRST: {
+            return "first by index";
+        } break;
+        case t_aggtype::AGGTYPE_LAST: {
+            return "last by index";
+        } break;
+        case t_aggtype::AGGTYPE_PY_AGG: {
+            return "py agg";
+        } break;
+        case t_aggtype::AGGTYPE_AND: {
+            return "and";
+        } break;
+        case t_aggtype::AGGTYPE_OR: {
+            return "or";
+        } break;
+        case t_aggtype::AGGTYPE_LAST_VALUE: {
+            return "last";
+        }
+        case t_aggtype::AGGTYPE_HIGH_WATER_MARK: {
+            return "high";
+        }
+        case t_aggtype::AGGTYPE_LOW_WATER_MARK: {
+            return "low";
+        }
+        case t_aggtype::AGGTYPE_SUM_NOT_NULL: {
+            return "sum not null";
+        }
+        case t_aggtype::AGGTYPE_MEAN_BY_COUNT: {
+            return "mean by count";
+        }
+        case t_aggtype::AGGTYPE_IDENTITY: {
+            return "identity";
+        }
+        case t_aggtype::AGGTYPE_DISTINCT_COUNT: {
+            return "distinct count";
+        }
+        case t_aggtype::AGGTYPE_DISTINCT_LEAF: {
+            return "distinct leaf";
+        }
+        case t_aggtype::AGGTYPE_PCT_SUM_PARENT: {
+            return "pct sum parent";
+        }
+        case t_aggtype::AGGTYPE_PCT_SUM_GRAND_TOTAL: {
+            return "pct sum grand total";
+        }
+        default: {
+            PSP_COMPLAIN_AND_ABORT("Unknown agg type");
+            return "unknown";
+        } break;
+    }
+}
+
+} 
+// end namespace perspective
 
 namespace std {
 
